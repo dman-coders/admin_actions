@@ -1,0 +1,35 @@
+<?php
+/**
+ * Install and update admin_actions block
+ */
+
+function admin_actions_enable() {
+  // Enable the block.
+  // Do so by emulating using the block admin UI.
+  $theme_default = variable_get('theme_default');
+  $admin_theme = variable_get('admin_theme');
+  $module = 'views';
+  $delta = 'admin_actions-admin_block';
+  $form_state = array();
+  form_load_include($form_state, 'inc', 'block', 'block.admin');
+  $form_state += array(
+    'values' => array(
+      'regions' => array(
+        $theme_default => array('content'),
+        $admin_theme => array('content'),
+      ),
+      'visibility' => 1,
+      'pages' => 'node/*/edit',
+      'submit' => 'Save block',
+      'op' => 'Save block',
+    ),
+  );
+  drupal_form_submit('block_admin_configure', $form_state, $module, $delta);
+  $strings = array(
+    '!link' => l('settings', "admin/structure/block/manage/$module/$delta/configure"),
+  );
+  drupal_set_message(
+    t('Enabled the admin_block !link to appear on node edit pages.', $strings)
+  );
+
+}

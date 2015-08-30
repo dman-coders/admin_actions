@@ -1,0 +1,42 @@
+<?php
+/**
+ * @file
+ * Code for the admin_actions feature.
+ */
+
+include_once 'admin_actions.features.inc';
+
+/**
+ * Intercept a VBO form and auto-select its row.
+ *
+ * Implements hook_form_alter().
+ */
+function admin_actions_form_views_form_alter(&$form, &$form_state) {
+  // Is it our form?
+  $view = $form_state['build_info']['args'][0];
+  if ($view->name == 'admin_actions') {
+    if (!empty($form['views_bulk_operations'])) {
+      foreach (element_children($form['views_bulk_operations']) as $row_id) {
+        $form['views_bulk_operations'][$row_id]['#default_value'] = TRUE;
+        $form['views_bulk_operations'][$row_id]['#type'] = 'hidden';
+      }
+    }
+
+    // Also need to nullify the table it was going to render.
+    // This is a bit hokey, but should intercept the replacement that happens
+    // later.
+    // Normally I'd intercept the #theme, but it doesn't seem to be what
+    // VBO is doing. Views (not VBO) is doing magic to 'output' at some stage.
+    // views_form_views_form()
+    //
+    // These tokens are what VBO is using.
+    // Seems to be   "<!--form-item-views_bulk_operations--0-->";
+    // But I'll let the system tell me exactly, in case it changes.
+    $stripped_markup = '';
+    foreach($form['#substitutions']['#value'] as $sub) {
+      $stripped_markup .= $sub['placeholder'];
+    }
+    $form['output']['#markup'] = $stripped_markup;
+  }
+
+}
