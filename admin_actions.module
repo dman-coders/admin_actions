@@ -15,9 +15,10 @@ function admin_actions_form_views_form_alter(&$form, &$form_state) {
   // Is it our form?
   $view = $form_state['build_info']['args'][0];
   if ($view->name == 'admin_actions') {
+    // Preselect the current (only) node.
     if (!empty($form['views_bulk_operations'])) {
       foreach (element_children($form['views_bulk_operations']) as $row_id) {
-        $form['views_bulk_operations'][$row_id]['#default_value'] = TRUE;
+        $form['views_bulk_operations'][$row_id]['#value'] = $form['views_bulk_operations'][$row_id]['#return_value'];
         $form['views_bulk_operations'][$row_id]['#type'] = 'hidden';
       }
     }
@@ -33,8 +34,10 @@ function admin_actions_form_views_form_alter(&$form, &$form_state) {
     // Seems to be   "<!--form-item-views_bulk_operations--0-->";
     // But I'll let the system tell me exactly, in case it changes.
     $stripped_markup = '';
-    foreach($form['#substitutions']['#value'] as $sub) {
-      $stripped_markup .= $sub['placeholder'];
+    if (isset($form['#substitutions'])) {
+      foreach ($form['#substitutions']['#value'] as $sub) {
+        $stripped_markup .= $sub['placeholder'];
+      }
     }
     $form['output']['#markup'] = $stripped_markup;
   }
