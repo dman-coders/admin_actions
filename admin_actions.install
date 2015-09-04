@@ -18,7 +18,7 @@ function admin_actions_enable() {
         $theme_default => array('content'),
         $admin_theme => array('content'),
       ),
-      'visibility' => 1,
+      'visibility' => BLOCK_VISIBILITY_LISTED,
       'pages' => 'node/*/edit',
       'submit' => 'Save block',
       'op' => 'Save block',

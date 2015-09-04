@@ -9,6 +9,13 @@ include_once 'admin_actions.features.inc';
 /**
  * Intercept a VBO form and auto-select its row.
  *
+ * We are taking what used to be a VBO table, with its embedded checkboxes,
+ * automatically selecting the one checkbox, and then choosing not to show the
+ * table at all - but do show the VBO buttons.
+ *
+ * Now you can just press the button and the thing will happen
+ * to the current entity
+ *
  * Implements hook_form_alter().
  */
 function admin_actions_form_views_form_alter(&$form, &$form_state) {

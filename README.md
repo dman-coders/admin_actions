@@ -16,13 +16,18 @@ This feature provides a *block* that is to be displayed underneath
  node (entity) edit forms.
 In some cases, if using a custom admin theme, this may need to be placed
  manually using block management UI.
+ /admin/structure/block/manage/views/admin_actions-admin_block/configure
+ 
+When enabled, a few example core actions (sticky,promote) are already on the
+ utility to show it working.
+ You probably won't want them, so it's OK to remove them and add your own.
  
 # Adding actions
 
 You are expected to edit the view yourself at
  /admin/structure/views/view/admin_actions
-Under 'Fields', select 'Bulk operations: Content (Content)'
-and select from the available actions.
+ Under 'Fields', select 'Bulk operations: Content (Content)'
+ and select from the available actions.
 More actions can become available from other modules that implement
  hook_action_info() 
 Local actions can also be configured at /admin/config/system/actions
