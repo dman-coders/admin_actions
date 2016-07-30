@@ -17,9 +17,11 @@ include_once 'admin_actions.features.inc';
  * to the current entity
  *
  * Implements hook_form_alter().
+ * @inheritdoc
  */
 function admin_actions_form_views_form_alter(&$form, &$form_state) {
   // Is it our form?
+  /** @var view $view */
   $view = $form_state['build_info']['args'][0];
   if ($view->name == 'admin_actions') {
     // Preselect the current (only) node.

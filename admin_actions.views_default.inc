@@ -1,7 +1,8 @@
 <?php
+
 /**
  * @file
- * admin_actions.views_default.inc
+ * Defines the `admin_actions` view, containing the mini-VBO `admin_block`.
  */
 
 /**
@@ -21,6 +22,7 @@ function admin_actions_views_default_views() {
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 
   /* Display: Master */
+  /** @var views_plugin_display $handler */
   $handler = $view->new_display('default', 'Master', 'default');
   $handler->display->display_options['title'] = 'Admin Actions';
   $handler->display->display_options['use_more_always'] = FALSE;
@@ -42,33 +44,33 @@ function admin_actions_views_default_views() {
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['entity_load_capacity'] = '10';
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['skip_batching'] = 1;
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array(
-    'action::node_make_sticky_action' => array(
-      'selected' => 1,
+    'action::node_make_sticky_action'   => array(
+      'selected'            => 1,
       'postpone_processing' => 0,
-      'skip_confirmation' => 1,
-      'override_label' => 0,
-      'label' => '',
+      'skip_confirmation'   => 1,
+      'override_label'      => 0,
+      'label'               => '',
     ),
     'action::node_make_unsticky_action' => array(
-      'selected' => 1,
+      'selected'            => 1,
       'postpone_processing' => 0,
-      'skip_confirmation' => 1,
-      'override_label' => 0,
-      'label' => '',
+      'skip_confirmation'   => 1,
+      'override_label'      => 0,
+      'label'               => '',
     ),
-    'action::node_promote_action' => array(
-      'selected' => 1,
+    'action::node_promote_action'       => array(
+      'selected'            => 1,
       'postpone_processing' => 0,
-      'skip_confirmation' => 1,
-      'override_label' => 0,
-      'label' => '',
+      'skip_confirmation'   => 1,
+      'override_label'      => 0,
+      'label'               => '',
     ),
-    'action::node_unpromote_action' => array(
-      'selected' => 1,
+    'action::node_unpromote_action'     => array(
+      'selected'            => 1,
       'postpone_processing' => 0,
-      'skip_confirmation' => 1,
-      'override_label' => 0,
-      'label' => '',
+      'skip_confirmation'   => 1,
+      'override_label'      => 0,
+      'label'               => '',
     ),
   );
   /* Field: Content: Title */

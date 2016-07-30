@@ -2,7 +2,6 @@
 /**
  * Install and update admin_actions block
  */
-
 function admin_actions_enable() {
   // Enable the block.
   // Do so by emulating using the block admin UI.
