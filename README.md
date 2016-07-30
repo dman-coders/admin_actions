@@ -28,8 +28,6 @@ Although the natural place to perform admin actions is on node edit forms,
  directly from the front-end.
  Access to these buttons will be handled by user role permissions set on the
  view, so you would not expect to allow anonymous users to see these tasks.
- Granualr control is available to actions if you enable 
- "Actions permissions (VBO)"
  
 # Adding actions
 
@@ -48,21 +46,35 @@ If your action needs settings, the settings form will be displayed
 
 # Extending control
 
+## Per Entity Type
+
 The initial setup provides one set of VBO buttons and makes it available
  for all node types.
 
-## Restrict to certain nodes
+### Restrict to certain nodes
 
 Is easiest done by just changing the "Content Types" restriction at
  `/admin/structure/block/manage/views/admin_actions-admin_block/configure`
 
-## Different buttons for different content types
+### Different buttons for different content types
 
 For more advanced control, you may want to *clone* the block in the Views UI
 `/admin/structure/views/view/admin_actions/edit/admin_block`
 and adjust the allowed "Bulk Operations" buttons to create a new set of actions.
 Place this block nearby your target content type, and customize from there.
- 
+
+## Permissions
+
+When installed, this utility is restricted to users with 
+`Permission | Administer content`
+This is a reasonably high-level permission, and not suitable for daily
+ content management. You can adjust this permission to your needs by editing the
+ view, or cloning the block into another display with different buttons and
+ different access controls.
+
+ More granular control is available to actions if you enable
+ **"Actions permissions (VBO)"**.
+
 # Implementation
 
 ### Limitations
@@ -86,3 +98,6 @@ This module is intentionally minimal code, leveraging VBO+Views 99.9% without
  but should feel familiar in other ways.
 To further refine the behaviour, we'd need to re-imagine the task and build
  it our own way.
+ 
+After auto-configuring the view block, this module only provides a 
+small amount of form-formatting help to hide some VBO defaults.

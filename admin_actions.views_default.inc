@@ -19,7 +19,7 @@ function admin_actions_views_default_views() {
   $view->human_name = 'Administration: Actions';
   $view->core = 7;
   $view->api_version = '3.0';
-  $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+  $view->disabled = FALSE;
 
   /* Display: Master */
   /** @var views_plugin_display $handler */
@@ -27,6 +27,7 @@ function admin_actions_views_default_views() {
   $handler->display->display_options['title'] = 'Admin Actions';
   $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['access']['type'] = 'perm';
+  $handler->display->display_options['access']['perm'] = 'administer nodes';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';

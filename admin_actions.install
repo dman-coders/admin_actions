@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Install and update admin_actions block
+ * Install and update admin_actions block.
  */
 function admin_actions_enable() {
   // Enable the block.
