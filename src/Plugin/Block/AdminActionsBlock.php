@@ -3,7 +3,6 @@
 namespace Drupal\admin_actions\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
-use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -103,16 +102,6 @@ class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  public function build() {
-    return array(
-      '#type' => 'markup',
-      '#markup' => 'Action buttons go here.',
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function blockForm($form, FormStateInterface $form_state) {
     // Internals slightly borrowed from
     // Drupal\system\Plugin\views\field\BulkForm.
@@ -137,6 +126,26 @@ class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInter
 
     return $form;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function blockSubmit($form, FormStateInterface $form_state) {
+    $this->setConfigurationValue('include_exclude', $form_state->getValue('include_exclude'));
+    $this->setConfigurationValue('selected_actions', $form_state->getValue('selected_actions'));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function build() {
+    $config = $this->getConfiguration();
+    return array(
+      '#type' => 'markup',
+      '#markup' => 'Action buttons go here.<pre>' . print_r(array_filter($config['selected_actions']), 1) . '</pre>',
+    );
+  }
+
 
   /**
    * Returns the available operations for this form.
