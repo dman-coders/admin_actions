@@ -1,0 +1,7 @@
+name: 'Admin actions'
+description: 'Exposes actions that can be performed on a single entity.'
+core: 8.x
+package: 'Fantastic Semantic Markup'
+type: module
+dependencies:
+- block
