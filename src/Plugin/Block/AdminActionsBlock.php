@@ -12,7 +12,6 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\ContentEntityInterface;
 
-
 /**
  * Provides a 'Admin Actions' block.
  *
@@ -125,10 +124,11 @@ class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInter
     $this->entityManager = $entity_manager;
     $this->actionStorage = $entity_manager->getStorage('action');
     $this->routeMatch = $route_match;
-
   }
 
   /**
+   * Configurations for the block.
+   *
    * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
@@ -157,6 +157,8 @@ class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInter
   }
 
   /**
+   * Save block configs.
+   *
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
@@ -165,46 +167,32 @@ class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInter
   }
 
   /**
+   * Produce the renderable block.
+   *
+   * The block here prepares the list of actions and tells the form what to do.
+   *
    * {@inheritdoc}
    */
   public function build() {
 
-    $config = $this->getConfiguration();
-
     /** @var \Drupal\Core\Entity\ContentEntityInterface $node */
     /** @var \Drupal\node\Entity\Node $node */
-    $node = $this->routeMatch->getParameter('node');
-    if (!$node) {
+    $entity = $this->routeMatch->getParameter('node');
+    if (!$entity) {
       return [];
     }
 
-    $form = [
-      '#type' => 'form',
-    ];
-    $form['entity_type'] = [
-      '#type' => 'hidden',
-      '#value' => $node->getEntityTypeId(),
-    ];
-    $form['entity_id'] = [
-      '#type' => 'hidden',
-      '#value' => $node->id(),
-    ];
-
-    $actions = $this->getActions($node->getEntityTypeId());
+    $config = $this->getConfiguration();
+    // Generate the short list of actions.
+    // Need an array_intersect_key() here. Do it by hand instead.
+    $available_actions = $this->getActions($entity->getEntityTypeId());
+    $actions = [];
     foreach (array_filter($config['selected_actions']) as $action_id) {
-      /** @var \Drupal\system\Entity\Action $action */
-      $action = $actions[$action_id];
-      $form[$action_id] = [
-        '#type' => 'submit',
-        '#value' => $action->get('label'),
-      ];
+      $actions[$action_id] = $available_actions[$action_id];
     }
 
-    $build = [
-      'form' => $form,
-    ];
-
-    return $build;
+    // Pass in our two extra parameters to the form builder.
+    return \Drupal::formBuilder()->getForm('Drupal\admin_actions\Form\AdminActionsBlockForm', $entity, $actions);
   }
 
   /**
@@ -232,7 +220,6 @@ class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInter
    * @see \Drupal\system\Plugin\views\field\BulkForm::getBulkOptions()
    */
   protected function getBulkOptions($filtered = TRUE) {
-
     $config = $this->getConfiguration();
     $options = array();
     $actions = $this->getActions('node');
@@ -251,10 +238,8 @@ class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInter
           continue;
         }
       }
-
       $options[$id] = $action->label();
     }
-
     return $options;
   }
 
@@ -278,8 +263,6 @@ class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInter
     return $this->actions;
   }
 
-
-
   /**
    * {@inheritdoc}
    *
@@ -291,7 +274,5 @@ class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInter
       'selected_actions' => [],
     ];
   }
-
-
 
 }
