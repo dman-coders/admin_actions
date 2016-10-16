@@ -8,6 +8,10 @@ use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\ContentEntityInterface;
+
 
 /**
  * Provides a 'Admin Actions' block.
@@ -20,10 +24,20 @@ use Drupal\Core\Entity\EntityManagerInterface;
  * I can have more control over what settings get passed to me
  * during __construct()
  *
+ * I'm not fully sure what the context chunk here does, but it seems to make
+ * it possible to get the current entity from the request.
+ *
  * @Block(
  *   id = "admin_actions_block",
  *   admin_label = @Translation("Admin Actions block"),
- *   category = @Translation("Actions to apply to entities")
+ *   category = @Translation("Actions to apply to entities"),
+ *   context = {
+ *     "node" = @ContextDefinition(
+ *       "entity:node",
+ *       required = FALSE,
+ *       label = @Translation("Current Node")
+ *     )
+ *   }
  * )
  */
 class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInterface {
@@ -37,6 +51,15 @@ class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInter
    * @var \Drupal\Core\Entity\EntityManagerInterface
    */
   protected $entityManager;
+
+  /**
+   * The route match.
+   *
+   * Used to retrieve the current contextual entity.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $routeMatch;
 
   /**
    * The action storage.
@@ -61,7 +84,10 @@ class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInter
    * Declaring the plugin create() lets us define the parameters/services
    * that are passed to the plugin __construct(). Dependency Injection bollox.
    *
-   * The important bit is that I declare that I want an entity manager.
+   * The important bit is that I declare that I want
+   * an entity manager - to provide the config list of rntity actions,
+   * the current route match - to tell me the context of the entity being
+   * viewed.
    *
    * @see __construct()
    */
@@ -70,7 +96,8 @@ class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInter
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity.manager')
+      $container->get('entity.manager'),
+      $container->get('current_route_match')
     );
   }
 
@@ -90,13 +117,15 @@ class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInter
    *
    * @see create()
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityManagerInterface $entity_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityManagerInterface $entity_manager, RouteMatchInterface $route_match) {
     // As we are overriding BlockBase::__construct(),
     // need to give it what it expects.
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityManager = $entity_manager;
     $this->actionStorage = $entity_manager->getStorage('action');
+    $this->routeMatch = $route_match;
+
   }
 
   /**
@@ -139,13 +168,57 @@ class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public function build() {
+
     $config = $this->getConfiguration();
-    return array(
-      '#type' => 'markup',
-      '#markup' => 'Action buttons go here.<pre>' . print_r(array_filter($config['selected_actions']), 1) . '</pre>',
-    );
+
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $node */
+    /** @var \Drupal\node\Entity\Node $node */
+    $node = $this->routeMatch->getParameter('node');
+    if (!$node) {
+      return [];
+    }
+
+    $form = [
+      '#type' => 'form',
+    ];
+    $form['entity_type'] = [
+      '#type' => 'hidden',
+      '#value' => $node->getEntityTypeId(),
+    ];
+    $form['entity_id'] = [
+      '#type' => 'hidden',
+      '#value' => $node->id(),
+    ];
+
+    $actions = $this->getActions($node->getEntityTypeId());
+    foreach (array_filter($config['selected_actions']) as $action_id) {
+      /** @var \Drupal\system\Entity\Action $action */
+      $action = $actions[$action_id];
+      $form[$action_id] = [
+        '#type' => 'submit',
+        '#value' => $action->get('label'),
+      ];
+    }
+
+    $build = [
+      'form' => $form,
+    ];
+
+    return $build;
   }
 
+  /**
+   * {@inheritdoc}
+   *
+   * Setting this tells the system that the block is cached differently
+   * for every route.
+   * As seen in BookNavigationBlock.
+   *
+   * We probably want role access to affect caching also.
+   */
+  public function getCacheContexts() {
+    return Cache::mergeContexts(parent::getCacheContexts(), ['route', 'user.permissions']);
+  }
 
   /**
    * Returns the available operations for this form.
@@ -204,5 +277,21 @@ class AdminActionsBlock extends BlockBase implements ContainerFactoryPluginInter
     });
     return $this->actions;
   }
+
+
+
+  /**
+   * {@inheritdoc}
+   *
+   * Declaring this prevents undefined index warnings the first time.
+   */
+  public function defaultConfiguration() {
+    return [
+      'include_exclude' => FALSE,
+      'selected_actions' => [],
+    ];
+  }
+
+
 
 }

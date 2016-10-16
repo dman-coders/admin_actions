@@ -3,3 +3,8 @@
  * @file
  * Code for admin_actions.
  */
+/**
+ * Implements hook_block_build_alter().
+ */
+function admin_actions_block_build_alter(array &$build, \Drupal\Core\Block\BlockPluginInterface $block) {
+}

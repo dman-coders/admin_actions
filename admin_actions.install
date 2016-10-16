@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Install and uninstall functions for Admin Actions module.
+ */
+
+/**
  * Install and update admin_actions block.
  *
  * The new block should be placed on the node page(s) at install time.
