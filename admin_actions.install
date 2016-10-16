@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Enable or disable Admin Actions module.
+ */
+
+/**
  * Install and update admin_actions block.
  */
 function admin_actions_enable() {
